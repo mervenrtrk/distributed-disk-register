@@ -82,6 +82,11 @@ distributed-disk-register/
 │               └── family.proto
 ```
 
+## 👨🏻‍💻 Kodlama
+
+Yüksek seviyeli dillerde yazılım geliştirme işlemi basit bir editörden ziyade gelişmiş bir IDE (Integrated Development Environment) ile yapılması tavsiye edilmektedir. JVM ailesi dillerinin en çok tercih edilen [IntelliJ IDEA](https://www.jetbrains.com/idea/) aracını edu' lu mail adresinizle öğrenci lisanslı olarak indirip kullanabilirsiniz. Bu projeyi diskinize klonladıktan sonra IDEA' yı açıp, üst menüden _Open_ seçeneği projenin _pom.xml_ dosyasını seçtiğinizde projeniz açılacaktır. 
+
+
 ---
 
 ## 🔧 Derleme
