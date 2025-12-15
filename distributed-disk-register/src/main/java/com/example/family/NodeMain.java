@@ -63,7 +63,7 @@ public class NodeMain {
     }
 
     private static void startLeaderTextListener(NodeRegistry registry, NodeInfo self) {
-    // Sadece lider (5555 portlu node) bu methodu çağırmalı
+    
     new Thread(() -> {
         try (ServerSocket serverSocket = new ServerSocket(6666)) {
             System.out.printf("Leader listening for text on TCP %s:%d%n",
@@ -94,10 +94,59 @@ private static void handleClientTextConnection(Socket client,
 
             long ts = System.currentTimeMillis();
 
-            // Kendi üstüne de yaz
-            System.out.println("📝 Received from TCP: " + text);
+            
+            System.out.println("Received from TCP: " + text);
+            String[] parts = text.split(" ", 3);
+            String command = parts[0].toUpperCase();
+if (command.equals("SET")) {
 
-            ChatMessage msg = ChatMessage.newBuilder()
+    
+    if (parts.length < 3) {
+        System.out.println("Invalid SET command format");
+        continue;
+    }
+
+    long messageId;
+    try {
+        messageId = Long.parseLong(parts[1]);
+    } catch (NumberFormatException e) {
+        System.out.println("Invalid message ID");
+        continue;
+    }
+
+    String message = parts[2];
+
+    System.out.println("   SET command received");
+    System.out.println("   ID: " + messageId);
+    System.out.println("   Message: " + message);
+
+}
+else if (command.equals("GET")) {
+
+    // GET <id>
+    if (parts.length < 2) {
+        System.out.println("Invalid GET command format");
+        continue;
+    }
+
+    long messageId;
+    try {
+        messageId = Long.parseLong(parts[1]);
+    } catch (NumberFormatException e) {
+        System.out.println("Invalid message ID");
+        continue;
+    }
+
+    System.out.println("GET command received");
+    System.out.println("   ID: " + messageId);
+
+}
+else {
+    System.out.println("Unknown command: " + command);
+}
+
+
+          /*   ChatMessage msg = ChatMessage.newBuilder()
                     .setText(text)
                     .setFromHost(self.getHost())
                     .setFromPort(self.getPort())
@@ -105,7 +154,7 @@ private static void handleClientTextConnection(Socket client,
                     .build();
 
             // Tüm family üyelerine broadcast et
-            broadcastToFamily(registry, self, msg);
+            broadcastToFamily(registry, self, msg);*/
         }
 
     } catch (IOException e) {
