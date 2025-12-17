@@ -1,41 +1,31 @@
 package com.example.family;
 
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
-import java.util.Scanner;
 
 public class SimpleClient {
 
-    public static void main(String[] args) {
-        try {
-            String host = "127.0.0.1";
-            int port = 6666;
+    public static void main(String[] args) throws Exception {
 
-            Socket socket = new Socket(host, port);
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            Scanner scanner = new Scanner(System.in);
+        try (Socket socket = new Socket("127.0.0.1", 6666);
+             BufferedReader in = new BufferedReader(
+                     new InputStreamReader(socket.getInputStream()));
+             PrintWriter out = new PrintWriter(
+                     socket.getOutputStream(), true);
+             BufferedReader stdin = new BufferedReader(
+                     new InputStreamReader(System.in))
+        ) {
+            System.out.println("Connected to leader. Type commands:");
 
-            System.out.println("Connected to HaToKuSe Leader");
-            System.out.println("Commands:");
-            System.out.println("  SET <id> <message>");
-            System.out.println("  GET <id>");
-            System.out.println("  exit");
+            String line;
+            while ((line = stdin.readLine()) != null) {
 
-            while (true) {
-                System.out.print("> ");
-                String line = scanner.nextLine();
+                out.println(line);              // → Server’a gönder
+                String response = in.readLine(); // ← Server’dan cevap
 
-                if (line.equalsIgnoreCase("exit")) {
-                    break;
-                }
-
-                out.println(line);
+                if (response == null) break;
+                System.out.println("Server: " + response);
             }
-
-            socket.close();
-            System.out.println("Disconnected.");
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }

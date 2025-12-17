@@ -41,15 +41,32 @@ public class FamilyServiceImpl extends FamilyServiceGrpc.FamilyServiceImplBase {
     }
 
     // Diğer düğümlerden broadcast mesajı geldiğinde
-    @Override
-    public void receiveChat(ChatMessage request, StreamObserver<Empty> responseObserver) {
-        System.out.println("💬 Incoming message:");
-        System.out.println("  From: " + request.getFromHost() + ":" + request.getFromPort());
-        System.out.println("  Text: " + request.getText());
-        System.out.println("  Timestamp: " + request.getTimestamp());
-        System.out.println("--------------------------------------");
+@Override
+public void receiveChat(ChatMessage request, StreamObserver<Empty> responseObserver) {
 
-        responseObserver.onNext(Empty.newBuilder().build());
-        responseObserver.onCompleted();
+    String text = request.getText();
+    System.out.println("💬 Incoming replication: " + text);
+
+    String[] parts = text.split(" ", 3);
+
+    if (parts.length == 3 && parts[0].equalsIgnoreCase("SET")) {
+        try {
+            long id = Long.parseLong(parts[1]);
+            String value = parts[2];
+
+            // ✅ FOLLOWER MEMORY WRITE
+            NodeMain.putToMemory(id, value);
+
+            System.out.printf("✅ Replica stored: %d = %s%n", id, value);
+
+        } catch (NumberFormatException e) {
+            System.err.println("❌ Invalid SET replication message");
+        }
     }
+
+    responseObserver.onNext(Empty.newBuilder().build());
+    responseObserver.onCompleted();
+}
+
+
 }

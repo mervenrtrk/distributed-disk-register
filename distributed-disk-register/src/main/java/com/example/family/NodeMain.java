@@ -21,10 +21,17 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.*;
 
+
 public class NodeMain {
 
     private static final int START_PORT = 5555;
     private static final int PRINT_INTERVAL_SECONDS = 10;
+    private static final ConcurrentMap<Long, String> memoryRegister = new ConcurrentHashMap<>();
+
+
+    public static void putToMemory(long id, String value) {
+    memoryRegister.put(id, value);
+}
 
     public static void main(String[] args) throws Exception {
         String host = "127.0.0.1";
@@ -34,6 +41,12 @@ public class NodeMain {
                 .setHost(host)
                 .setPort(port)
                 .build();
+    int tolerance = 1; // default
+        if (port == START_PORT) {
+            tolerance = ToleranceConfig.load();
+            System.out.println("Leader tolerance level = " + tolerance);
+    }
+
 
         NodeRegistry registry = new NodeRegistry();
         FamilyServiceImpl service = new FamilyServiceImpl(registry, self);
@@ -48,7 +61,7 @@ public class NodeMain {
 
                 // Eğer bu ilk node ise (port 5555), TCP 6666'da text dinlesin
                 if (port == START_PORT) {
-                    startLeaderTextListener(registry, self);
+                    startLeaderTextListener(registry, self, tolerance);
                 }
 
                 discoverExistingNodes(host, port, registry, self);
@@ -62,8 +75,10 @@ public class NodeMain {
 
     }
 
-    private static void startLeaderTextListener(NodeRegistry registry, NodeInfo self) {
-    
+private static void startLeaderTextListener(NodeRegistry registry,
+                                            NodeInfo self,
+                                            int tolerance) {
+
     new Thread(() -> {
         try (ServerSocket serverSocket = new ServerSocket(6666)) {
             System.out.printf("Leader listening for text on TCP %s:%d%n",
@@ -71,7 +86,9 @@ public class NodeMain {
 
             while (true) {
                 Socket client = serverSocket.accept();
-                new Thread(() -> handleClientTextConnection(client, registry, self)).start();
+                new Thread(() ->
+                    handleClientTextConnection(client, registry, self, tolerance)
+                ).start();
             }
 
         } catch (IOException e) {
@@ -80,9 +97,57 @@ public class NodeMain {
     }, "LeaderTextListener").start();
 }
 
+ private static boolean replicateSetToFamily(NodeRegistry registry,
+                                             NodeInfo self,
+                                             long id,
+                                             String value,
+                                             int tolerance) {
+
+    int success = 1; // leader itself
+
+    List<NodeInfo> members = registry.snapshot();
+
+    for (NodeInfo n : members) {
+
+        if (n.getHost().equals(self.getHost()) &&
+            n.getPort() == self.getPort()) {
+            continue;
+        }
+
+        try {
+            ManagedChannel channel = ManagedChannelBuilder
+                    .forAddress(n.getHost(), n.getPort())
+                    .usePlaintext()
+                    .build();
+
+            FamilyServiceGrpc.FamilyServiceBlockingStub stub =
+                    FamilyServiceGrpc.newBlockingStub(channel);
+
+            ChatMessage msg = ChatMessage.newBuilder()
+                    .setText("SET " + id + " " + value)
+                    .setFromHost(self.getHost())
+                    .setFromPort(self.getPort())
+                    .setTimestamp(System.currentTimeMillis())
+                    .build();
+
+            stub.receiveChat(msg);
+            success++;
+
+        } catch (Exception e) {
+            // follower unreachable → ignore
+        }
+    }
+
+    return success >= (tolerance + 1);
+}
+ 
+
+
+
+
 private static void handleClientTextConnection(Socket client,
                                                NodeRegistry registry,
-                                               NodeInfo self) {
+                                               NodeInfo self, int tolerance) {
     System.out.println("New TCP client connected: " + client.getRemoteSocketAddress());
     try (BufferedReader reader = new BufferedReader(
             new InputStreamReader(client.getInputStream()))) {
@@ -100,9 +165,9 @@ private static void handleClientTextConnection(Socket client,
             String command = parts[0].toUpperCase();
 if (command.equals("SET")) {
 
-    
     if (parts.length < 3) {
-        System.out.println("Invalid SET command format");
+        client.getOutputStream().write(
+            "ERROR Invalid SET format\n".getBytes());
         continue;
     }
 
@@ -110,22 +175,38 @@ if (command.equals("SET")) {
     try {
         messageId = Long.parseLong(parts[1]);
     } catch (NumberFormatException e) {
-        System.out.println("Invalid message ID");
+        client.getOutputStream().write(
+            "ERROR Invalid ID\n".getBytes());
         continue;
     }
 
     String message = parts[2];
+  boolean committed = replicateSetToFamily(
+            registry,
+            self,
+            messageId,
+            message,
+            tolerance
+    );
 
-    System.out.println("   SET command received");
-    System.out.println("   ID: " + messageId);
-    System.out.println("   Message: " + message);
+    if (committed) {
+        // ✅ SADECE BURADA MEMORY'YE YAZ
+        memoryRegister.put(messageId, message);
 
+        client.getOutputStream().write(
+            ("OK SET " + messageId + "\n").getBytes());
+    } else {
+        client.getOutputStream().write(
+            "ERROR Quorum not reached\n".getBytes());
+    }
 }
+
+
 else if (command.equals("GET")) {
 
-    // GET <id>
     if (parts.length < 2) {
-        System.out.println("Invalid GET command format");
+        client.getOutputStream().write(
+            "ERROR Invalid GET format\n".getBytes());
         continue;
     }
 
@@ -133,16 +214,31 @@ else if (command.equals("GET")) {
     try {
         messageId = Long.parseLong(parts[1]);
     } catch (NumberFormatException e) {
-        System.out.println("Invalid message ID");
+        client.getOutputStream().write(
+            "ERROR Invalid ID\n".getBytes());
         continue;
     }
 
-    System.out.println("GET command received");
-    System.out.println("   ID: " + messageId);
+    String value = memoryRegister.get(messageId);
 
+    if (value == null) {
+        client.getOutputStream().write(
+            ("NOT_FOUND " + messageId + "\n").getBytes());
+    } else {
+        client.getOutputStream().write(
+            ("VALUE " + messageId + " " + value + "\n").getBytes());
+    }
 }
+else if (command.equals("EXIT")) {
+
+    System.out.println("Client requested exit.");
+    break;
+}
+
+
 else {
-    System.out.println("Unknown command: " + command);
+    client.getOutputStream().write(
+        ("ERROR Unknown command\n").getBytes());
 }
 
 
@@ -163,6 +259,11 @@ else {
         try { client.close(); } catch (IOException ignored) {}
     }
 }
+
+
+
+
+
 
 private static void broadcastToFamily(NodeRegistry registry,
                                       NodeInfo self,

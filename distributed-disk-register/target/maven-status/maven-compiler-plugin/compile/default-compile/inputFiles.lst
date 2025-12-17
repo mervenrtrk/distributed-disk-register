@@ -2,6 +2,7 @@ C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-re
 C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\src\main\java\com\example\family\NodeMain.java
 C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\src\main\java\com\example\family\NodeRegistry.java
 C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\src\main\java\com\example\family\SimpleClient.java
+C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\src\main\java\com\example\family\ToleranceConfig.java
 C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\target\generated-sources\protobuf\grpc-java\family\FamilyServiceGrpc.java
 C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\target\generated-sources\protobuf\java\family\ChatMessage.java
 C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\target\generated-sources\protobuf\java\family\ChatMessageOrBuilder.java
