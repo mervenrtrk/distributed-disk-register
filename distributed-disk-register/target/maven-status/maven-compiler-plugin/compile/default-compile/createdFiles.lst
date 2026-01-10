@@ -1,7 +1,11 @@
 family\FamilyServiceGrpc$FamilyServiceImplBase.class
 family\FamilyServiceGrpc$FamilyServiceBlockingStub.class
+family\GetRequest$1.class
+family\GetResponse$1.class
 family\Empty$1.class
+family\GetResponseOrBuilder.class
 family\FamilyView.class
+family\GetResponse.class
 family\NodeInfo$1.class
 family\Empty$Builder.class
 family\FamilyServiceGrpc$FamilyServiceFileDescriptorSupplier.class
@@ -18,6 +22,7 @@ family\FamilyServiceGrpc$FamilyServiceMethodDescriptorSupplier.class
 family\FamilyServiceGrpc$FamilyServiceStub.class
 family\NodeInfo$Builder.class
 family\ChatMessage.class
+family\GetRequestOrBuilder.class
 family\FamilyServiceGrpc$AsyncService.class
 family\ChatMessage$Builder.class
 family\FamilyView$Builder.class
@@ -28,3 +33,6 @@ family\Empty.class
 family\FamilyViewOrBuilder.class
 family\NodeInfoOrBuilder.class
 family\FamilyServiceGrpc$1.class
+family\GetRequest.class
+family\GetRequest$Builder.class
+family\GetResponse$Builder.class

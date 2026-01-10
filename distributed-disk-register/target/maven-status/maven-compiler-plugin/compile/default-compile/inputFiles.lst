@@ -1,4 +1,5 @@
 C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\src\main\java\com\example\family\FamilyServiceImpl.java
+C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\src\main\java\com\example\family\HaToKuSeClient.java
 C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\src\main\java\com\example\family\NodeMain.java
 C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\src\main\java\com\example\family\NodeRegistry.java
 C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\src\main\java\com\example\family\SimpleClient.java
@@ -11,5 +12,9 @@ C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-re
 C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\target\generated-sources\protobuf\java\family\FamilyProto.java
 C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\target\generated-sources\protobuf\java\family\FamilyView.java
 C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\target\generated-sources\protobuf\java\family\FamilyViewOrBuilder.java
+C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\target\generated-sources\protobuf\java\family\GetRequest.java
+C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\target\generated-sources\protobuf\java\family\GetRequestOrBuilder.java
+C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\target\generated-sources\protobuf\java\family\GetResponse.java
+C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\target\generated-sources\protobuf\java\family\GetResponseOrBuilder.java
 C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\target\generated-sources\protobuf\java\family\NodeInfo.java
 C:\Users\Merve\Desktop\SistemProje\distributed-disk-register\distributed-disk-register\target\generated-sources\protobuf\java\family\NodeInfoOrBuilder.java

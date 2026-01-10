@@ -1,32 +1,41 @@
 package com.example.family;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class ToleranceConfig {
 
     private static final String CONFIG_FILE = "tolerance.conf";
 
     public static int load() {
-        int tolerance = 1; // default (failsafe)
+        int tolerance = 1; // default
 
-        try (BufferedReader br = new BufferedReader(
-                new FileReader(CONFIG_FILE))) {
+        try {
+            InputStream is = ToleranceConfig.class
+                    .getClassLoader()
+                    .getResourceAsStream(CONFIG_FILE);
 
+            if (is == null) {
+                System.err.println(
+                        "WARNING: tolerance.conf not found in resources, using default=1");
+                return tolerance;
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
             String line;
+
             while ((line = br.readLine()) != null) {
                 line = line.trim();
-
                 if (line.startsWith("tolerance=")) {
-                    String value = line.split("=", 2)[1];
-                    tolerance = Integer.parseInt(value);
+                    tolerance = Integer.parseInt(
+                            line.split("=", 2)[1]
+                    );
                 }
             }
 
-        } catch (IOException e) {
-            System.err.println(
-                "WARNING: tolerance.conf not found, using default tolerance=1");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return tolerance;

@@ -20,8 +20,8 @@ public class SimpleClient {
             String line;
             while ((line = stdin.readLine()) != null) {
 
-                out.println(line);              // → Server’a gönder
-                String response = in.readLine(); // ← Server’dan cevap
+                out.println(line);              //  Server’a gönder
+                String response = in.readLine(); //  Server’dan cevap
 
                 if (response == null) break;
                 System.out.println("Server: " + response);
